@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
+        android:id="@+id/navheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_gravity="top"
+            android:background="@color/background"
+
+            >
+
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/menu_background"
+
+                >
+
+                <include layout="@layout/header_layout" />
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+    </RelativeLayout>
+
+    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navheader"
+        android:visibility="gone"
+        android:indeterminate="true"
+        app:spb_sections_count="4"
+        app:spb_color="@color/colorAccent"
+        app:spb_speed="2.0"
+        app:spb_stroke_width="4dp"
+        app:spb_stroke_separator_length="4dp"
+        app:spb_reversed="false"
+        app:spb_mirror_mode="false"
+        app:spb_progressiveStart_activated="true"
+        app:spb_progressiveStart_speed="2.5"
+        app:spb_progressiveStop_speed="3.4"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/pages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/navheader"
+        android:layout_above="@id/navbottom">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+
+  <android.support.v7.widget.RecyclerView
+      android:id="@+id/recyclerview"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      tools:listitem="@layout/home_layout_contents"
+      >
+
+
+  </android.support.v7.widget.RecyclerView>
+            <include
+                android:id="@+id/no_connection_view"
+                layout="@layout/no_internet_layout"
+                android:visibility="gone"
+               />
+
+            <ImageView
+                android:id="@+id/create_postbtn"
+                android:background="@drawable/create_background"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_create_black_24dp"
+                android:layout_gravity="bottom|right"/>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/navbottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/background"
+
+
+       >
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/buttomView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/toolbar_background"
+
+            app:itemIconTint="@color/color_selector"
+           app:itemTextColor="@color/textmenu"
+            app:menu="@menu/menu_drawer">
+
+        </android.support.design.widget.BottomNavigationView>
+
+    </android.support.design.widget.AppBarLayout>
+    </RelativeLayout>
+</RelativeLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

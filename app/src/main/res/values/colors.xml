@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFaa23</color>
+    <color name="colorPrimaryDark">#bc80520b</color>
+    <color name="colorAccent">#e0efac43</color>
+    <color name="background">#ffffff</color>
+    <color name="support">#4dFFaa23</color>
+    <color name="h1">#ffFFaa23</color>
+    <color name="unvisited">#66535151</color>
+    <color name="button">#66FFaa23</color>
+    <color name="test">#66FFaa23</color>
+    <color name="textmenu">#747272</color>
+    <color name="stroke">#77ab59</color>
+    <color name="filterbackground">#7b037e33</color>
+    <color name="backgrounggreen">#3b59ab81</color>
+    <color name="textbackgeound">#f4f4f4</color>
+    <color name="dafault">#FAFAFA</color>
+</resources>
