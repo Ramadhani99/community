@@ -15,7 +15,7 @@
                 android:color="@color/stroke"
                 />
             <corners android:radius="16dp" />
-            <solid android:color="@color/backgrounggreen"/>
+            <solid android:color="@color/till_light"/>
         </shape>
     </item>
 

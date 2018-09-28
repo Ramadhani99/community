@@ -181,4 +181,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (SharedPreferenceHelper.getUSer(getBaseContext())!=null){
+            Intent login=new Intent(MainActivity.this,TestActivity.class);
+            //login.putExtra("token",token);
+            startActivity(login);
+            finish();
+
+        };
+    }
 }

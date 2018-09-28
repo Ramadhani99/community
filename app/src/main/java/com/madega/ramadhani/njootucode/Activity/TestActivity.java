@@ -53,7 +53,7 @@ public class TestActivity extends AppCompatActivity  {
 
        fragment=new HomeFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.pages,fragment)
+                .replace(R.id.pages,fragment)
                 .commit();
 
 

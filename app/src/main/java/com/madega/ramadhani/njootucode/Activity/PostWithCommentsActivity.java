@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import es.dmoral.toasty.Toasty;
 
 
 public class PostWithCommentsActivity extends AppCompatActivity implements  View.OnClickListener {
@@ -50,6 +52,8 @@ public class PostWithCommentsActivity extends AppCompatActivity implements  View
 
     private RelativeLayout maddCommentView;
     private EditText mTextcomment;
+
+
 
 
     @Override
@@ -76,7 +80,7 @@ public class PostWithCommentsActivity extends AppCompatActivity implements  View
         LoginUser= SharedPreferenceHelper.getUSer(getBaseContext());
 
 
-
+        post=new Gson().fromJson(getIntent().getStringExtra(POST), PostModel.class);
         SendData();
 
 
@@ -87,7 +91,7 @@ public class PostWithCommentsActivity extends AppCompatActivity implements  View
 
 
     private void SendData(){
-        post=new Gson().fromJson(getIntent().getStringExtra(POST), PostModel.class);
+
 
 
 
@@ -165,7 +169,9 @@ public class PostWithCommentsActivity extends AppCompatActivity implements  View
                 startActivity(goBack);
                 finish();
                 break;
-
+            case  R.id.addcommentbtn:
+                Createcomment();
+                break;
                 default:
                     break;
         }
@@ -183,5 +189,27 @@ public class PostWithCommentsActivity extends AppCompatActivity implements  View
 
         getMenuInflater().inflate(R.menu.option_menu,menu);
         return true;
+    }
+    private void Createcomment(){
+
+        AsyncHttpClient createpost=new AsyncHttpClient();
+        RequestParams params=new RequestParams();
+        params.put("token",LoginUser.getToken());
+        params.put("content",mTextcomment.getText().toString());
+        params.put("post_id",post.getId());
+
+        createpost.post(StaticInformation.PUBLISH_POST, params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e(TAG,responseString);
+                Toasty.error(getBaseContext(),responseString, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Toasty.success(getBaseContext(),responseString, Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 }

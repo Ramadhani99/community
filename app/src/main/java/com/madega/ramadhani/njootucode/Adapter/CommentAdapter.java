@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -75,7 +76,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
 
             mPostcard=itemView.findViewById(R.id.post_card);
             mAllComment=itemView.findViewById(R.id.all_comments);
+
             mAuthorName=itemView.findViewById(R.id.comenter);
+
             mAuthorImage=itemView.findViewById(R.id.my_image);
             mLikes=itemView.findViewById(R.id.count_like);
 
@@ -89,7 +92,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
             mBtnmore=itemView.findViewById(R.id.btnmore);
             mBtnmore.setOnClickListener(this);
 
-            Typeface robot=Typeface.createFromAsset(context.getAssets(),"font/Roboto-Medium.ttf");
+            Typeface robot=Typeface.createFromAsset(context.getAssets(),"font/PlayfairDisplay-Bold.ttf");
             mOpenPost.setTypeface(robot);
 
         }
@@ -164,6 +167,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.share:
+                                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                                    sharingIntent.setType("text/plain");
+                                    String shareBody =  mCommentView.getText().toString()+"\nwww.olbongo.com";
+                                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                                    context.startActivity(Intent.createChooser(sharingIntent, "Share the Link"));
+                                    break;
+                                    default:
+                                        break;
+                            }
                             return false;
                         }
                     });

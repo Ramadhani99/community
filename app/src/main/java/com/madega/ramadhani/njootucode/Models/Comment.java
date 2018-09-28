@@ -5,6 +5,7 @@ package com.madega.ramadhani.njootucode.Models;
  */
 
 public class Comment {
+
     private boolean hasComment;
     private PostModel postModel;
     private int id;

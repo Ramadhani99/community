@@ -63,6 +63,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mPostAdapter=new PostAdapter(this, list_of_postModel);
         mRecyclerView.setAdapter(mPostAdapter);
+
         getData();
 
         mTryagain=findViewById(R.id.tryagain);

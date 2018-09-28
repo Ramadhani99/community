@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
@@ -16,9 +18,11 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity;
 import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
+import com.madega.ramadhani.njootucode.Helper.EndlessRecyclerViewScrollListener;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.Models.User;
 import com.madega.ramadhani.njootucode.R;
+import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 import com.madega.ramadhani.njootucode.Storage.SharedPreferenceHelper;
 
 import org.json.JSONArray;
@@ -28,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import es.dmoral.toasty.Toasty;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 /**
@@ -38,6 +43,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private static String TAG = "HomeFragment";
 
+    private EndlessRecyclerViewScrollListener scrollListener;
+
     public static User logiuser;
 
     private PostModel mPostModel;
@@ -46,7 +53,42 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private RecyclerView mRecyclerView;
     private LinearLayoutManager linearLayoutManager;
     private View mTryagain, mTryagainView, mProgressBar, mCreatePostBtn;
+
+    private ApplicationDatabase Db;
+
+
     private SmoothProgressBar mSmoothProgressBar;
+
+    @Override
+    public void onStart() {
+        Db = ApplicationDatabase.getApplicationDatabase(getContext());
+        super.onStart();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                for (PostModel getmodel : Db.postdao().getAllpost()) {
+                    list_of_postModel.add(getmodel);
+
+                }
+
+
+                return null;
+
+            }
+
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mPostAdapter.notifyDataSetChanged();
+            }
+        }.execute(null, null);
+
+
+
+
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -59,11 +101,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
 
         linearLayoutManager = new LinearLayoutManager(getContext());
+
         linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mPostAdapter = new PostAdapter(getContext(), list_of_postModel);
         mRecyclerView.setAdapter(mPostAdapter);
-        getData();
+        getData(0);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                getData(page);
+
+
+
+
+            }
+        };
+
+
+
+        mRecyclerView.addOnScrollListener(scrollListener);
+
 
         mTryagain = v.findViewById(R.id.tryagain);
         mTryagain.setOnClickListener(this);
@@ -74,21 +134,37 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return v;
     }
 
-    private void getData() {
+
+
+
+    private void getData(int page) {
+
+        Toasty.info(getContext(),"current page "+page, Toast.LENGTH_SHORT).show();
+
 
         AsyncHttpClient client = new AsyncHttpClient();
-        logiuser= SharedPreferenceHelper.getUSer(getContext());
-        String mytoken=logiuser.getToken();
-        RequestParams params = new RequestParams("token", mytoken);
+        logiuser = SharedPreferenceHelper.getUSer(getContext());
+        String mytoken = logiuser.getToken();
+        RequestParams params = new RequestParams();
+        params.put("token",mytoken);
+        params.put("page",page);
         client.get(StaticInformation.POST, params, new TextHttpResponseHandler() {
+
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                mTryagainView.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.GONE);
                 mSmoothProgressBar.setVisibility(View.GONE);
+
+                if (page==0){
+                    list_of_postModel.clear();
+                }
+
+
+
+                Log.e(TAG,"success "+statusCode);
+
                 try {
-                    Log.e(TAG, mytoken);
+                    //Log.e(TAG, mytoken);
                     JSONArray questionArray = new JSONArray(responseBody);
                     for (int i = 0; i < questionArray.length(); i++) {
                         JSONObject object = questionArray.getJSONObject(i);
@@ -128,13 +204,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         }
 
 
-
                         list_of_postModel.add(postModel);
-                        Log.e(TAG, postModel.getPost() + "" + postModel.getDate() + " " + postModel.getUser());
-                        //Log.e(TAG,  postModel.getPostImage());
+
                         mPostAdapter.notifyDataSetChanged();
 
                     }
+
+             if (page==0) {
+
+                 new AsyncTask<Void, Void, Void>() {
+                     @Override
+                     protected Void doInBackground(Void... voids) {
+
+                         Db.postdao().DeleteAllfromPost();
+                         for (PostModel model : list_of_postModel) {
+                             Db.postdao().InsertPost(model);
+                         }
+                         for (PostModel getmodel : Db.postdao().getAllpost()) {
+                             Log.e(TAG, "From Database" + getmodel.getUser());
+
+                         }
+
+
+                         return null;
+
+                     }
+                 }.execute(null, null);
+             }
 
 
                 } catch (Exception e) {
@@ -147,19 +243,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable error) {
 
-                //Toasty.success(getBaseContext(),"request time out").show();
-                mTryagainView.setVisibility(View.VISIBLE);
-                mProgressBar.setVisibility(View.GONE);
                 mSmoothProgressBar.setVisibility(View.GONE);
+                //Log.e(TAG,"Failure "+responseBody+statusCode);
 
             }
 
             @Override
             public void onStart() {
                 super.onStart();
-                mSmoothProgressBar.setVisibility(View.VISIBLE);
+                if (page>0){
+                    mSmoothProgressBar.setVisibility(View.VISIBLE);
+                }
+
+
+               //
 
             }
+
         });
     }
 
@@ -168,11 +268,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.create_postbtn:
                 startActivity(new Intent(getActivity(), PostPublishLayoutActivity.class));
+                getActivity().finish();
                 break;
             case R.id.tryagain:
-                // mProgressBar.setVisibility(View.VISIBLE);
                 list_of_postModel.clear();
-                getData();
                 break;
             default:
                 break;

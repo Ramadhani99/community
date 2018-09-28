@@ -10,7 +10,9 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class PostModel {
 
-    @PrimaryKey
+
+
+    @PrimaryKey(autoGenerate = false)
     private int id;
 
     private String Share,Postname,Date,post;
@@ -20,6 +22,7 @@ public class PostModel {
     private String PosterImage;
 
     private String PostImage;
+
 
     public int getId() {
         return id;

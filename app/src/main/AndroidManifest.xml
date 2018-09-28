@@ -22,7 +22,8 @@
         <activity android:name=".Activity.HomeActivity" />
         <activity android:name=".Activity.PostPublishLayoutActivity" />
         <activity android:name=".Activity.PostWithCommentsActivity" />
-        <activity android:name=".Activity.TestActivity"></activity>
+        <activity android:name=".Activity.TestActivity" />
+        <activity android:name=".Activity.ViewPhotoLayoutActivity"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.R;
+import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,10 +41,18 @@ public class CommunityFragment extends Fragment implements View.OnClickListener 
     private PostModel mPostModel;
     private List<PostModel> list_of_postModel = new ArrayList<>();
     private PostAdapter mPostAdapter;
+    private ApplicationDatabase Db;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager linearLayoutManager;
     private View mTryagain, mTryagainView, mProgressBar, mCreatePostBtn;
     private SmoothProgressBar mSmoothProgressBar;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Db=ApplicationDatabase
+                .getApplicationDatabase(getContext());
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -71,6 +81,18 @@ public class CommunityFragment extends Fragment implements View.OnClickListener 
     }
 
     private void getData() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+               for (PostModel post:Db.postdao().getAllpost()){
+                   Log.e(TAG,post.getPostname());
+
+               }
+                return null;
+
+            }
+        } .execute(null,null);
         AsyncHttpClient client = new AsyncHttpClient();
 
         String mytoken = "4zt-37f40346d7b470d5d298:@olb:dnZ5";

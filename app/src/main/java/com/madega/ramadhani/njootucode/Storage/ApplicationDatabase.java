@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.madega.ramadhani.njootucode.Dao.PostDao;
 import com.madega.ramadhani.njootucode.Dao.UserDao;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.Models.User;
@@ -13,9 +14,11 @@ import com.madega.ramadhani.njootucode.Models.User;
  * Created by root on 9/14/18.
  */
 
- @Database(entities = {User.class,PostModel.class},version = 1)
+ @Database(entities = {User.class,PostModel.class},version = 3)
 public abstract class ApplicationDatabase extends RoomDatabase {
      public abstract UserDao userDao();
+
+     public abstract PostDao postdao();
 
      private static  ApplicationDatabase INSTANCE=null;
 

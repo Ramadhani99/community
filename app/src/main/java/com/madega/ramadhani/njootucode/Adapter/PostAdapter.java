@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Adapter;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -29,6 +30,7 @@ import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity;
 import com.madega.ramadhani.njootucode.Activity.PostWithCommentsActivity;
+import com.madega.ramadhani.njootucode.Activity.ViewPhotoLayoutActivity;
 import com.madega.ramadhani.njootucode.Fragments.HomeFragment;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.Models.User;
@@ -48,6 +50,8 @@ import static com.madega.ramadhani.njootucode.Activity.PostWithCommentsActivity.
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
     private  boolean test=false;
+
+
 
 
     private static String TAG="PostAdapter";
@@ -90,7 +94,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
 
         private PostModel postModel;
 
-        private TextView mComments,mShare,mPostername,mDate,mPostText;
+        private TextView mComments,mShare,mPostername,mDate,mPostText,mTotatlike;
         private ImageView mLikes,mProfileImage,mPostImage,mBtnMore,mDefaultImage,mUserImage;
         private ProgressBar mImageProgressBar;
         private View mCard,mControl,mWrite_post,mPostPublish,mPostLayout;
@@ -100,6 +104,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
         public Itemholder(View itemView) {
             super(itemView);
             mWrite_post=itemView.findViewById(R.id.write_post);
+
+            mTotatlike=itemView.findViewById(R.id.total_like);
             mLikes=itemView.findViewById(R.id.likes);
             mLikes.setOnClickListener(this);
 
@@ -121,21 +127,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
             Typeface awasomeFont = Typeface.createFromAsset(context.getAssets(), "font/Roboto-Light.ttf");
             mPostername.setTypeface(awasomeFont);
 
+
             mDate=itemView.findViewById(R.id.date);
             mProfileImage=itemView.findViewById(R.id.profile_image);
+
             mPostImage=itemView.findViewById(R.id.post_image);
+            mPostImage.setOnClickListener(this);
+
             mCard=itemView.findViewById(R.id.cardpostImage);
             mPostText=itemView.findViewById(R.id.posttext);
+            mPostText.setOnClickListener(this);
+
             mControl=itemView.findViewById(R.id.imageControl);
             mImageProgressBar=itemView.findViewById(R.id.imageProgressBar);
             mDefaultImage=itemView.findViewById(R.id.default_image);
 
-            mUserImage=itemView.findViewById(R.id.my_image);
+           // mUserImage=itemView.findViewById(R.id.my_image);
 
-            mPostPublish=itemView.findViewById(R.id.publish_post);
-            mPostPublish.setOnClickListener(this);
+           // mPostPublish=itemView.findViewById(R.id.publish_post);
+           // mPostPublish.setOnClickListener(this);
 
-            Typeface robot=Typeface.createFromAsset(context.getAssets(),"font/Roboto-Regular.ttf");
+            Typeface robot=Typeface.createFromAsset(context.getAssets(),"font/Merienda-Regular.ttf");
             mPostText.setTypeface(robot);
 
 
@@ -144,29 +156,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
             Log.e(TAG, postModel.getPost());
             mDefaultImage.setVisibility(View.VISIBLE);
             mControl.setVisibility(View.VISIBLE);
-            if (position==0){
-                mWrite_post.setVisibility(View.VISIBLE);
-                Glide.with(context)
-                        .load(HomeFragment.logiuser.getProfileImgaePath())
-                        .listener(new RequestListener<Drawable>() {
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                return false;
-                            }
 
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                return false;
-                            }
-                        }).into(mUserImage);
-
-
-
-
-            }
-            else {
-                mWrite_post.setVisibility(View.GONE);
-            }
             if (postModel.getPostImage().length()<5){
                 mCard.setVisibility(View.GONE);
                 mControl.setVisibility(View.VISIBLE);
@@ -220,6 +210,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
                     .into(mProfileImage);
             mComments.setText(postModel.getComments()+" Comments");
             mDate.setText(postModel.getDate());
+            mTotatlike.setText(""+postModel.getLikes());
 
             mPostername.setText(postModel.getUser());
 
@@ -234,9 +225,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
         public void onClick(View v) {
 
             switch (v.getId()){
-                case R.id.publish_post:
-                  context.startActivity(new Intent(context, PostPublishLayoutActivity.class));
-                    break;
+
                 case R.id.likes:
 
 
@@ -263,13 +252,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
                     }
                     break;
                 case R.id.comments:
-                    Intent openPost=new Intent(context,PostWithCommentsActivity.class);
-                    openPost.putExtra(POST,new Gson().toJson(postModel));
-                    context.startActivity(openPost);
+                    OpenPost();
                     break;
                 case R.id.btnmore:
                      PopUp();
                     break;
+                case R.id.post_image:
+                    Intent showImage=new Intent(context,ViewPhotoLayoutActivity.class);
+                   showImage.putExtra("image",postModel.getPostImage());
+                    context.startActivity(showImage);
+                    break;
+                case R.id.posttext:
+                    OpenPost();
+                    break;
+
                 default:
                     break;
             }
@@ -283,11 +279,31 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
             popup.setOnMenuItemClickListener(new OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.share:
+                            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                            sharingIntent.setType("text/plain");
+                            String shareBody = mPostText.getText().toString() + "\nwww.olbongo.com";
+                            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                            context.startActivity(Intent.createChooser(sharingIntent, "Share the Link"));
+                            break;
+                        default:
+                            break;
+
+
+                    }
                     return false;
                 }
             });
 
             popup.show();
+        }
+        private void OpenPost(){
+            Intent openPost=new Intent(context,PostWithCommentsActivity.class);
+            openPost.putExtra(POST,new Gson().toJson(postModel));
+            context.startActivity(openPost);
+            ((Activity)context).finish();
         }
     }
 }

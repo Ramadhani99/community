@@ -5,63 +5,69 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity">
+
     <RelativeLayout
         android:id="@+id/top"
-        android:layout_alignParentTop="true"
-
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
         <LinearLayout
             android:id="@+id/banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/menu_background">
+            android:background="@drawable/menu_background"
+            android:orientation="horizontal">
+
             <ImageView
                 android:id="@+id/backbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
-                android:src="@drawable/ic_arrow_back_black_24dp"/>
+                android:src="@drawable/ic_arrow_back_black_24dp" />
 
             <TextView
-                android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:text="Comments"
-                android:textColor="@color/h1"
-                android:textStyle="bold"
-                android:textSize="20sp"
                 android:textAllCaps="true"
-                />
+                android:textColor="@color/h1"
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/center"
-        android:layout_above="@id/bottom"
-        android:background="@color/background"
-        android:layout_below="@id/top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+
+        android:layout_above="@id/bottom"
+
+        android:layout_below="@id/top"
+        android:background="@color/dafault">
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/comment_layout"
-            >
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
+                tools:listitem="@layout/comment_layout">
 
+            </android.support.v7.widget.RecyclerView>
 
 
         </FrameLayout>
 
     </RelativeLayout>
+
     <RelativeLayout
 
         android:id="@+id/bottom"
@@ -69,11 +75,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
-        <LinearLayout
-            android:background="@color/background"
 
+        <LinearLayout
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+            android:background="@color/background"
 
 
             android:orientation="horizontal">
@@ -82,54 +89,47 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                 android:layout_margin="4dp"
+                android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:padding="8dp"
                 android:background="@drawable/searchback"
                 android:orientation="horizontal"
+                android:padding="8dp"
 
 
                 >
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_imoge"
-                    android:padding="4dp"/>
+                    android:padding="4dp"
+                    android:src="@drawable/ic_imoge" />
+
                 <EditText
                     android:id="@+id/text_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/background"
-                    android:padding="4dp"
                     android:hint="comments....."
+                    android:padding="4dp"
                     android:textSize="14sp"
 
                     />
 
             </LinearLayout>
+
             <ImageView
                 android:id="@+id/addcommentbtn"
-                android:layout_margin="4dp"
-                android:padding="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_send_black_24dp"/>
+                android:layout_margin="4dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_send_black_24dp" />
 
 
         </LinearLayout>
 
 
     </RelativeLayout>
-
-
-
-
-
-
-
-
-
-
 
 
 </RelativeLayout>

@@ -1,61 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/dafault"
     android:layout_marginBottom="8dp"
     android:orientation="vertical"
 
     >
-    <LinearLayout
-        android:id="@+id/write_post"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/publish_post_background"
-        android:padding="16dp"
-        android:orientation="horizontal"
-
-        >
-
-        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/my_image"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/made"
-            app:civ_border_color="#FF000000" />
-
-        <LinearLayout
-            android:id="@+id/publish_post"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:layout_margin="8dp"
-                android:textSize="14sp"
-                android:text="write something........" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="8dp"
-                android:background="@color/backgrounggreen"/>
-        </LinearLayout>
-
-    </LinearLayout>
 
     <FrameLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
+        android:layout_margin="1dp"
 
         tools:context="com.madega.ramadhani.njootucode.Activity.MainActivity">
         "/>
@@ -64,21 +24,21 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background">
+            android:background="@color/dafault">
 
 
             <LinearLayout
                 android:id="@+id/post_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/postlayout_backgroud"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
-                    android:backgroundTint="@color/background">
+                    android:background="@color/dafault"
+                   >
 
                     <android.support.v7.widget.CardView
                         android:id="@+id/cardpostImage"
@@ -129,7 +89,7 @@
                 </View>
                 <TextView
                     android:id="@+id/posttext"
-                    android:background="@color/background"
+                    android:background="@color/dafault"
 
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -151,6 +111,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
+                    android:background="@color/dafault"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -162,10 +123,18 @@
                         android:layout_marginLeft="24dp"
                         android:src="@drawable/ic_favorite_border_black_24dp"
                         android:gravity="bottom"
-                        android:drawablePadding="4dp"
+
                         android:padding="8dp"
 
 
+                        android:textAlignment="center" />
+                    <TextView
+                        android:id="@+id/total_like"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                       android:textSize="14sp"
+                        android:text="Comments"
+                        android:fontFamily="sans-serif-light"
                         android:textAlignment="center" />
 
 
@@ -175,31 +144,22 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="24dp"
                         android:drawableLeft="@drawable/ic_comment_black_24dp"
-                        android:gravity="bottom"
+                        android:gravity="center"
                         android:drawablePadding="4dp"
+                        android:textSize="14sp"
                         android:padding="8dp"
+                        android:fontFamily="sans-serif-light"
                         android:text="Comments"
-
                         android:textAlignment="center" />
 
-                    <TextView
-                        android:id="@+id/share"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:drawableLeft="@drawable/ic_share_black_24dp"
-                        android:gravity="right|bottom"
-                        android:padding="8dp"
-                        android:drawablePadding="4dp"
-                        android:text="share"
-                        android:textAlignment="center" />
+
                 </LinearLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
@@ -209,8 +169,8 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/profile_image"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@drawable/made"
                     app:civ_border_color="#FF000000" />
             </LinearLayout>
@@ -281,5 +241,5 @@
 
     </FrameLayout>
 
-</LinearLayout>
+</android.support.v7.widget.CardView>
 

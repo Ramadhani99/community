@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -40,11 +41,12 @@
         android:visibility="gone"
         android:indeterminate="true"
         app:spb_sections_count="1"
-        app:spb_color="@color/stroke"
-        app:spb_speed="1.0"
+        app:spb_color="@color/till"
+        app:spb_speed="5.0"
+        android:layout_gravity="bottom"
         app:spb_stroke_width="2dp"
-        app:spb_stroke_separator_length="4dp"
-        app:spb_reversed="false"
+        app:spb_stroke_separator_length="2dp"
+        app:spb_reversed="true"
         app:spb_mirror_mode="true"
         app:spb_progressiveStart_activated="true"
         app:spb_progressiveStart_speed="2.5"

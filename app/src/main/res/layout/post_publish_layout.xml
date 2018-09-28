@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
         <EditText
-            android:id="@+id/published_post"
+            android:id="@+id/txtpost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
@@ -153,6 +153,7 @@
                 android:layout_marginRight="8dp"
                 android:src="@drawable/ic_insert_photo_black_24dp"/>
             <TextView
+                android:id="@+id/publish_btn"
                 android:background="@drawable/buttonbackground"
                 android:layout_gravity="bottom"
                 android:layout_width="wrap_content"

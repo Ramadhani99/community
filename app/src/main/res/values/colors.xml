@@ -15,4 +15,7 @@
     <color name="backgrounggreen">#3b59ab81</color>
     <color name="textbackgeound">#f4f4f4</color>
     <color name="dafault">#FAFAFA</color>
+    <color name="till_light">#5f009688</color>
+    <color name="till">#00796B</color>
+    <color name="blackBackground">#f2000000</color>
 </resources>
