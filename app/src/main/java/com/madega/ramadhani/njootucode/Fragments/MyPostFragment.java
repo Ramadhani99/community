@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.R;
+import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,41 +38,39 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
 
     private static String TAG = "MyPostFragment";
 
-    private PostModel mPostModel;
-    private List<PostModel> list_of_postModel = new ArrayList<>();
-    private PostAdapter mPostAdapter;
-    private RecyclerView mRecyclerView;
-    private LinearLayoutManager linearLayoutManager;
-    private View mTryagain, mTryagainView, mProgressBar, mCreatePostBtn;
+    private ApplicationDatabase Db;
+
+
     private SmoothProgressBar mSmoothProgressBar;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Db=ApplicationDatabase
+                .getApplicationDatabase(getContext());
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.home_fragment, container, false);
-        mRecyclerView = v.findViewById(R.id.recyclerview);
-        mCreatePostBtn = v.findViewById(R.id.create_postbtn);
-        mCreatePostBtn.setOnClickListener(this);
+        View v = inflater.inflate(R.layout.comment_layout, container, false);
 
-        mSmoothProgressBar = v.findViewById(R.id.progress);
-
-
-        linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mPostAdapter = new PostAdapter(getContext(), list_of_postModel);
-        mRecyclerView.setAdapter(mPostAdapter);
-        getData();
-
-        mTryagain = v.findViewById(R.id.tryagain);
-        mTryagain.setOnClickListener(this);
-
-        mTryagainView = v.findViewById(R.id.no_connection_view);
-        mProgressBar = v.findViewById(R.id.tyr_again_progressbar);
 
         return v;
     }
 
     private void getData() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                for (PostModel post:Db.postdao().getAllpost()){
+                    Log.e(TAG,post.getPostname());
+
+                }
+                return null;
+
+            }
+        } .execute(null,null);
         AsyncHttpClient client = new AsyncHttpClient();
 
         String mytoken = "4zt-37f40346d7b470d5d298:@olb:dnZ5";
@@ -79,8 +79,7 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                mTryagainView.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.GONE);
+
                 mSmoothProgressBar.setVisibility(View.GONE);
                 try {
                     Log.e(TAG, mytoken);
@@ -99,7 +98,7 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
 
                         JSONObject postername = new JSONObject(object.optString("publisher"));
 
-                        postModel.setUser(postername.optString("display_name"));
+                        postModel.setPublisherName(postername.optString("display_name"));
                         postModel.setPosterImage(postername.optString("dp"));
                         if (object.has("images")) {
 
@@ -118,19 +117,12 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
                             }
                         }
 
-                        // JSONObject imageObject=object.getJSONObject("images");
-                        //                       JSONArray arrayImages=object.getJSONArray("images");
-//                        for(int j=0;i<arrayImages.length();i++){
-//                            JSONObject image=arrayImages.getJSONObject(i);
-
-//                            Log.e(TAG,postModel.getPostImage());
-//                        }
 
 
-                        list_of_postModel.add(postModel);
-                        Log.e(TAG, postModel.getPost() + "" + postModel.getDate() + " " + postModel.getUser());
+
+                        Log.e(TAG, postModel.getPost() + "" + postModel.getDate() + " " + postModel.getPublisherName());
                         //Log.e(TAG,  postModel.getPostImage());
-                        mPostAdapter.notifyDataSetChanged();
+
 
                     }
 
@@ -146,8 +138,7 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable error) {
 
                 //Toasty.success(getBaseContext(),"request time out").show();
-                mTryagainView.setVisibility(View.VISIBLE);
-                mProgressBar.setVisibility(View.GONE);
+
                 mSmoothProgressBar.setVisibility(View.GONE);
 
             }
@@ -164,14 +155,7 @@ public class MyPostFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.create_postbtn:
-                startActivity(new Intent(getActivity(), PostPublishLayoutActivity.class));
-                break;
-            case R.id.tryagain:
-                // mProgressBar.setVisibility(View.VISIBLE);
-                list_of_postModel.clear();
-                getData();
-                break;
+
             default:
                 break;
         }

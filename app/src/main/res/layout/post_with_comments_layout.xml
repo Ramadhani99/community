@@ -49,6 +49,72 @@
 
         android:layout_below="@id/top"
         android:background="@color/dafault">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+
+            android:id="@+id/post_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:elevation="10dp"
+            android:padding="2dp"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/open_post"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2dp"
+                    android:padding="16dp"
+                    android:textAppearance="@color/till_light"
+                    android:textSize="18sp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/open_post_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitXY"
+                        />
+                </FrameLayout>
+
+
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+            <LinearLayout
+                android:id="@+id/all_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/support_light"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:id="@+id/total_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="100 comments" />
+
+            </LinearLayout>
+
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -57,7 +123,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="400dp"
 
                 tools:listitem="@layout/comment_layout">
 
@@ -65,16 +131,32 @@
 
 
         </FrameLayout>
+        </LinearLayout>
+        </ScrollView>
 
     </RelativeLayout>
 
     <RelativeLayout
-
         android:id="@+id/bottom"
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
+        <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:spb_sections_count="4"
+            app:spb_color="@color/colorAccent"
+            app:spb_speed="2.0"
+            app:spb_stroke_width="4dp"
+            app:spb_stroke_separator_length="2dp"
+            app:spb_reversed="false"
+            app:spb_mirror_mode="false"
+            app:spb_progressiveStart_activated="true"
+            app:spb_progressiveStart_speed="2.5"
+            app:spb_progressiveStop_speed="3.4"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +168,9 @@
             android:orientation="horizontal">
 
 
+
             <LinearLayout
+                android:id="@+id/post_comment_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"

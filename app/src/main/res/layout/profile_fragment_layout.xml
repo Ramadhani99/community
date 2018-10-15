@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/constraint"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/cover_photo"
+        android:layout_width="match_parent"
+        android:layout_height="139dp"
+        android:scaleType="centerCrop"
+
+        android:src="@drawable/made"
+  />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_photo"
+        android:layout_width="114dp"
+        android:layout_height="113dp"
+        android:layout_marginBottom="372dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="24dp"
+        android:src="@drawable/made"
+        app:civ_border_color="#ffffff"
+        app:civ_border_width="0.2sp"
+        app:layout_constraintBottom_toBottomOf="@id/cover_photo"
+        app:layout_constraintTop_toBottomOf="@id/cover_photo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/follower_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/profile_photo"
+        app:layout_constraintTop_toBottomOf="@id/cover_photo">
+
+        <TextView
+            android:id="@+id/follower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:text="13k"
+           />
+
+        <TextView
+
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:fontFamily="sans-serif"
+            android:text="Followers"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@id/profile_photo"
+            app:layout_constraintTop_toBottomOf="@+id/follower" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/following_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/follower_layout"
+        app:layout_constraintTop_toBottomOf="@id/cover_photo">
+    <TextView
+        android:id="@+id/following"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_margin="4dp"
+        android:text="300"
+        />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="Following"
+
+        android:textSize="16sp"
+
+         />
+    </LinearLayout>
+    <LinearLayout
+        app:layout_constraintStart_toEndOf="@+id/following_layout"
+        app:layout_constraintTop_toBottomOf="@id/follower_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fiendrecyclerview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/friend_follow_layout"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

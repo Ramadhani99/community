@@ -30,6 +30,9 @@ public interface PostDao {
     @Query("Delete from postmodel")
     void DeleteAllfromPost();
 
+    @Delete
+    void Deletepost(PostModel postModel);
+
 
 
 }

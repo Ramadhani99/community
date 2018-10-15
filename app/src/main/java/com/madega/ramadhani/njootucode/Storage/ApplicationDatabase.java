@@ -14,7 +14,7 @@ import com.madega.ramadhani.njootucode.Models.User;
  * Created by root on 9/14/18.
  */
 
- @Database(entities = {User.class,PostModel.class},version = 3)
+ @Database(entities = {User.class,PostModel.class},version = 6)
 public abstract class ApplicationDatabase extends RoomDatabase {
      public abstract UserDao userDao();
 

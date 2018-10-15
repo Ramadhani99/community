@@ -16,18 +16,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
+import com.madega.ramadhani.njootucode.Activity.ViewPhotoLayoutActivity;
+import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Models.Comment;
 import com.madega.ramadhani.njootucode.Models.PostModel;
+import com.madega.ramadhani.njootucode.Models.User;
 import com.madega.ramadhani.njootucode.R;
+import com.madega.ramadhani.njootucode.Storage.SharedPreferenceHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by root on 9/18/18.
@@ -64,92 +75,86 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
 
     public class Itemholder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-       private TextView mOpenPost,mCommentView,mAuthorName,mLikes,mTotalCommments;
-       private View mPostcard,mAllComment,mCommentLayout;
+        private User LOGINUSER= SharedPreferenceHelper.getUSer(context);
+
+        private Comment comment;
+        private  int current_position;
+
+       private TextView mOpenPost,mCommentView,mAuthorName,mLikes,mTotalCommments,mCommentedTime;
+
        private ImageView mOpenPostImage,mBtnmore,mDefaulImage,mAuthorImage;
 
         public Itemholder(View itemView) {
 
             super(itemView);
-            mOpenPost=itemView.findViewById(R.id.open_post);
-            mOpenPostImage=itemView.findViewById(R.id.open_post_image);
 
-            mPostcard=itemView.findViewById(R.id.post_card);
-            mAllComment=itemView.findViewById(R.id.all_comments);
+            //mOpenPostImage=itemView.findViewById(R.id.open_post_image);
+
+
+
 
             mAuthorName=itemView.findViewById(R.id.comenter);
 
             mAuthorImage=itemView.findViewById(R.id.my_image);
             mLikes=itemView.findViewById(R.id.count_like);
 
-            mCommentLayout=itemView.findViewById(R.id.comment_layout);
+           // mCommentLayout=itemView.findViewById(R.id.comment_layout);
 
-            mTotalCommments=itemView.findViewById(R.id.total_comment);
+
 
             mCommentView=itemView.findViewById(R.id.comenter_view);
+
+            mCommentedTime=itemView.findViewById(R.id.date_comment);
+
 
 
             mBtnmore=itemView.findViewById(R.id.btnmore);
             mBtnmore.setOnClickListener(this);
 
-            Typeface robot=Typeface.createFromAsset(context.getAssets(),"font/PlayfairDisplay-Bold.ttf");
-            mOpenPost.setTypeface(robot);
 
         }
         public void SaveData(Comment comment,int position){
+            current_position=position;
 
-            if (position==0){
-                post=comment.getPostModel();
-                mPostcard.setVisibility(View.VISIBLE);
-
-                mOpenPost.setText(post.getPost());
-                Linkify.addLinks(mOpenPost,Linkify.ALL);
-                //mDefaulImage.setVisibility(View.VISIBLE);
-
-                mAllComment.setVisibility(View.VISIBLE);
-
-
-
-                Glide.with(context)
-                        .load(post.getPostImage())
-                        .listener(new RequestListener<Drawable>() {
-
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-
-                                mOpenPostImage.setVisibility(View.GONE);
-
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-
-                                //mDefaulImage.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .into(mOpenPostImage);
-
-            }
+//            if (position<1){
+//                post=comment.getPostModel();
+//                mPostcard.setVisibility(View.VISIBLE);
+//
+//
+//                //mDefaulImage.setVisibility(View.VISIBLE);
+//
+//               // mAllComment.setVisibility(View.VISIBLE);
+//
+//
+//
+//
+//
+//            }
+//            else {
+//                mPostcard.setVisibility(View.GONE);
+//                mAllComment.setVisibility(View.GONE);
+//            }
             if (comment.isHasComment()){
+
 
                 Log.e(TAG,comment.getBody());
                 mCommentView.setText(comment.getBody());
                 mAuthorName.setText(comment.getCommenter());
                 Glide.with(context).load(comment.getCommenterPhoto()).into(mAuthorImage);
                 mLikes.setText(""+comment.getLikes());
-                mTotalCommments.setText(""+post.getComments()+" Comments");
+
+                mCommentedTime.setText(comment.getData_commented());
 
             }
             else {
 
-                mTotalCommments.setText("No Comments");
-                mCommentLayout.setVisibility(View.GONE);
+                //mTotalCommments.setText("No Comments");
+               // mCommentLayout.setVisibility(View.GONE);
 
 
 
             }
+            this.comment=comment;
 
 
 
@@ -163,6 +168,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                     PopupMenu popup = new PopupMenu(context, mBtnmore);
 
                     popup.inflate(R.menu.option_menu);
+                    if (LOGINUSER.getId()!=comment.getCommenterId()){
+                        popup.getMenu().findItem(R.id.delete).setVisible(false);
+                    }
+
 
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
@@ -176,6 +185,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                                     sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                                     context.startActivity(Intent.createChooser(sharingIntent, "Share the Link"));
                                     break;
+                                case R.id.delete:
+                                    DeleteComment();
+
                                     default:
                                         break;
                             }
@@ -186,9 +198,36 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                     popup.show();
 
                     break;
-                    default:
+                case R.id.open_post_image:
+
                         break;
             }
+        }
+        private void DeleteComment(){
+
+            AsyncHttpClient deletepost=new AsyncHttpClient();
+            RequestParams params=new RequestParams();
+            params.put("token",LOGINUSER.getToken());
+            params.put("comment_id",comment.getId());
+            deletepost.get(StaticInformation.DELETE_COMMENT,params, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Toasty.error(context,responseString, Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    Toasty.success(context,"delete successfully", Toast.LENGTH_SHORT).show();
+
+                    comments.remove(current_position);
+                    notifyItemRemoved(current_position);
+                    notifyItemRangeRemoved(current_position,getItemCount());
+                    notifyDataSetChanged();
+                }
+            });
+
+
         }
     }
 

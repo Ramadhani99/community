@@ -5,6 +5,7 @@
     <color name="colorAccent">#e0efac43</color>
     <color name="background">#ffffff</color>
     <color name="support">#4dFFaa23</color>
+    <color name="support_light">#0fd69d43</color>
     <color name="h1">#ffFFaa23</color>
     <color name="unvisited">#66535151</color>
     <color name="button">#66FFaa23</color>
@@ -18,4 +19,5 @@
     <color name="till_light">#5f009688</color>
     <color name="till">#00796B</color>
     <color name="blackBackground">#f2000000</color>
+    <color name="blacklight">#6c000000</color>
 </resources>

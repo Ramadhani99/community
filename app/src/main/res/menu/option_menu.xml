@@ -12,6 +12,10 @@
 
           android:title="share">
       </item>
+      <item android:id="@+id/delete"
+
+          android:title="delete">
+      </item>
 
 
 

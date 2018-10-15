@@ -1,14 +1,14 @@
 package com.madega.ramadhani.njootucode.Helper;
 
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+        import android.support.v7.widget.GridLayoutManager;
+        import android.support.v7.widget.LinearLayoutManager;
+        import android.support.v7.widget.RecyclerView;
+        import android.support.v7.widget.StaggeredGridLayoutManager;
 
 public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
     // The minimum amount of items to have below your current scroll position
     // before loading more.
-    private int visibleThreshold =2;
+    private int visibleThreshold =6;
     // The current offset index of data you have loaded
     private int currentPage = 0;
     // The total number of items in the dataset after the last load

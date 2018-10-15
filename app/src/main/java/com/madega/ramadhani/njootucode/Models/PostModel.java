@@ -1,6 +1,7 @@
 package com.madega.ramadhani.njootucode.Models;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -10,10 +11,16 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class PostModel {
 
+    @Ignore
+    public int ATTACHMENT_TYPE=0;
+
 
 
     @PrimaryKey(autoGenerate = false)
     private int id;
+
+
+    private boolean isLike;
 
     private String Share,Postname,Date,post;
 
@@ -22,6 +29,8 @@ public class PostModel {
     private String PosterImage;
 
     private String PostImage;
+    private String publisherName;
+    private int publisherId;
 
 
     public int getId() {
@@ -32,15 +41,15 @@ public class PostModel {
         this.id = id;
     }
 
-    public String getUser() {
-        return user;
+    public String getPublisherName() {
+        return publisherName;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setPublisherName(String user) {
+        this.publisherName = user;
     }
 
-    private String user;
+
 
     public int getLikes() {
         return Likes;
@@ -104,5 +113,21 @@ public class PostModel {
 
     public void setPostImage(String postImage) {
         PostImage = postImage;
+    }
+
+    public int getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(int publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public boolean isLike() {
+        return isLike;
+    }
+
+    public void setLike(boolean like) {
+        isLike = like;
     }
 }

@@ -1,9 +1,12 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -20,14 +24,18 @@ import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Helper.EndlessRecyclerViewScrollListener;
 import com.madega.ramadhani.njootucode.Models.PostModel;
+import com.madega.ramadhani.njootucode.Models.PostPublishModel;
 import com.madega.ramadhani.njootucode.Models.User;
 import com.madega.ramadhani.njootucode.R;
 import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 import com.madega.ramadhani.njootucode.Storage.SharedPreferenceHelper;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,13 +47,18 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
  * Created by root on 9/22/18.
  */
 
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener,PostAdapter.PostAdapterCallback {
+
 
     private static String TAG = "HomeFragment";
+    private PostPublishModel mPostPublishModel;
 
     private EndlessRecyclerViewScrollListener scrollListener;
 
     public static User logiuser;
+
+
+    private static  Parcelable mlistState;
 
     private PostModel mPostModel;
     private List<PostModel> list_of_postModel = new ArrayList<>();
@@ -54,10 +67,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private LinearLayoutManager linearLayoutManager;
     private View mTryagain, mTryagainView, mProgressBar, mCreatePostBtn;
 
+    private SwipeRefreshLayout mRefresher;
+
     private ApplicationDatabase Db;
 
 
-    private SmoothProgressBar mSmoothProgressBar;
+    private SmoothProgressBar mSmoothProgressBar,mPublishPostProgress;
+
+
+
+
 
     @Override
     public void onStart() {
@@ -68,7 +87,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             protected Void doInBackground(Void... voids) {
 
                 for (PostModel getmodel : Db.postdao().getAllpost()) {
-                    list_of_postModel.add(getmodel);
+                    if (list_of_postModel.isEmpty() || list_of_postModel.size()<25) {
+                        list_of_postModel.add(getmodel);
+                    }
 
                 }
 
@@ -88,6 +109,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
 
 
+
+
+
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,27 +122,31 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mCreatePostBtn.setOnClickListener(this);
 
         mSmoothProgressBar = v.findViewById(R.id.progress);
+        mPublishPostProgress = v.findViewById(R.id.progressup);
 
 
         linearLayoutManager = new LinearLayoutManager(getContext());
 
-        linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mPostAdapter = new PostAdapter(getContext(), list_of_postModel);
+        mPostAdapter = new PostAdapter(getContext(), list_of_postModel,HomeFragment.this);
         mRecyclerView.setAdapter(mPostAdapter);
+
         getData(0);
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 
-                getData(page);
+                getData(page+1);
 
 
 
 
             }
         };
+       mRefresher= v.findViewById(R.id.swiperefresh);
+       mRefresher.setOnRefreshListener(() -> getData(1));
 
 
 
@@ -139,7 +167,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private void getData(int page) {
 
-        Toasty.info(getContext(),"current page "+page, Toast.LENGTH_SHORT).show();
+       // Toasty.info(getContext(),"current page "+page, Toast.LENGTH_SHORT).show();
 
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -154,8 +182,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                 mSmoothProgressBar.setVisibility(View.GONE);
+                mRefresher.setRefreshing(false);
 
-                if (page==0){
+                if (page==0||page==1){
                     list_of_postModel.clear();
                 }
 
@@ -179,28 +208,45 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         postModel.setDate(object.getString("published_at"));
                         postModel.setLikes(object.getInt("total_likes"));
                         postModel.setComments(object.getInt("total_commenets"));
+                        postModel.setLike(object.optBoolean("is_liked"));
 
 
-                        JSONObject postername = new JSONObject(object.optString("publisher"));
+                        JSONObject publisher_details = new JSONObject(object.optString("publisher"));
 
-                        postModel.setUser(postername.optString("display_name"));
-                        postModel.setPosterImage(postername.optString("dp"));
+                        postModel.setPublisherName(publisher_details.optString("display_name"));
+                        postModel.setPosterImage(publisher_details.optString("dp"));
+                        postModel.setPublisherId(publisher_details.optInt("id"));
 
                         if (object.has("images")) {
 
                             if (!object.isNull("images")) {
                                 JSONArray Array = new JSONArray(object.optString("images"));
                                 if (Array.length() > 0) {
+                                    postModel.ATTACHMENT_TYPE=1;
                                     JSONObject image = Array.getJSONObject(0);
                                     postModel.setPostImage(image.optString("photo"));
                                 } else {
-                                    postModel.setPostImage("1");
+                                    if (!object.isNull("docs")){
+                                        JSONArray Array2=new JSONArray(object.optString("docs"));
+                                        if (Array2.length()>0) {
+                                            postModel.ATTACHMENT_TYPE=2;
+                                            JSONObject doc = Array2.getJSONObject(0);
+                                            postModel.setPostImage(doc.optString("doc"));
+                                            Log.e(TAG,doc.optString("doc"));
+                                        }else{
+                                            postModel.setPostImage("1");
+                                        }
+                                    }
+
                                 }
 
 
                             } else {
-                                postModel.setPostImage("im null right now");
+                                postModel.setPostImage("2");
                             }
+                        }
+                        else {
+                            postModel.setPostImage("2");
                         }
 
 
@@ -210,7 +256,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                     }
 
-             if (page==0) {
+             if (page==0 || page==1) {
 
                  new AsyncTask<Void, Void, Void>() {
                      @Override
@@ -221,7 +267,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                              Db.postdao().InsertPost(model);
                          }
                          for (PostModel getmodel : Db.postdao().getAllpost()) {
-                             Log.e(TAG, "From Database" + getmodel.getUser());
+                             Log.e(TAG, "From Database" + getmodel.getPublisherName());
 
                          }
 
@@ -244,14 +290,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable error) {
 
                 mSmoothProgressBar.setVisibility(View.GONE);
-                //Log.e(TAG,"Failure "+responseBody+statusCode);
+                Log.e(TAG,"Failure "+responseBody+statusCode);
 
             }
 
             @Override
             public void onStart() {
                 super.onStart();
-                if (page>0){
+                if (page>1){
                     mSmoothProgressBar.setVisibility(View.VISIBLE);
                 }
 
@@ -267,8 +313,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.create_postbtn:
-                startActivity(new Intent(getActivity(), PostPublishLayoutActivity.class));
-                getActivity().finish();
+                Intent myintent=new Intent(getActivity(), PostPublishLayoutActivity.class);
+              // mlistState= linearLayoutManager.onSaveInstanceState();
+
+                getActivity(). startActivityForResult(myintent,1);
+
                 break;
             case R.id.tryagain:
                 list_of_postModel.clear();
@@ -277,4 +326,146 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
+
+
+    @Override
+    public void sendObject(PostModel postModel) {
+        //Toasty.success(getContext(),postModel.getPost(),Toast.LENGTH_SHORT).show();
+
+
+
+
+
+        String url_api;
+        Log.e(TAG,postModel.isLike()+"");
+
+        AsyncHttpClient likepost=new AsyncHttpClient();
+        RequestParams params=new RequestParams();
+        params.put("token",logiuser.getToken());
+        params.put("post_id",postModel.getId());
+        if (postModel.isLike()){
+            url_api=StaticInformation.UNLIKE_POST;
+        }
+        else {
+            url_api=StaticInformation.LIKE_POST;
+        }
+        likepost.get(url_api,params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                //Toasty.error(getContext(),responseString,Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                try {
+                    JSONArray responze  = new JSONArray(responseString);
+
+                    JSONObject object = responze.getJSONObject(0);
+                    if (object.getBoolean("status") ){
+
+
+
+                    }
+                    else if (object.getBoolean("status") ){
+
+                    }
+                    else {
+                       // Toasty.error(getContext(),responseString,Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+        });
+
+
+
+    }
+
+
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Toasty.success(getContext(),"inafika hapa",Toast.LENGTH_SHORT).show();
+        getActivity();
+
+        if (requestCode == 1) {
+            String result=data.getStringExtra("result");
+            mPostPublishModel=new Gson().fromJson(result,PostPublishModel.class);
+            if(resultCode == Activity.RESULT_OK){
+                createPost();
+
+                Toasty.success(getContext(),"Fragment"+mPostPublishModel.getUser_token(), Toast.LENGTH_SHORT).show();
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+
+            }
+        }
+        else {
+            Toasty.error(getContext(),"hiooo"+mPostPublishModel.getUser_token(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void createPost(){
+
+        AsyncHttpClient createpost=new AsyncHttpClient();
+        RequestParams params=new RequestParams();
+        params.put("token",mPostPublishModel.getUser_token());
+        params.put("content",mPostPublishModel.getTextPost());
+
+            //Log.e(TAG,ImgUrl);
+            try {
+
+                if(mPostPublishModel.getImgPost() != null){
+                    params.put("photo",new File(mPostPublishModel.getImgPost()));
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.e(TAG,"ERROR upload file "+ e.getMessage());
+
+            }
+
+        createpost.post(StaticInformation.PUBLISH_POST, params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e(TAG,""+statusCode+""+responseString);
+                Toasty.error(getContext(),""+statusCode+""+responseString, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Toasty.success(getContext(),responseString, Toast.LENGTH_SHORT).show();
+
+
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                mPublishPostProgress.setVisibility(View.VISIBLE);
+
+            }
+        });
+    }
+
+
 }
+

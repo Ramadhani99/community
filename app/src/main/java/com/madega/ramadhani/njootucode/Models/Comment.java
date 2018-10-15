@@ -12,7 +12,9 @@ public class Comment {
     private String body;
     private int likes;
     private String commenter;
+    private int commenterId;
     private String commenterPhoto;
+    private String data_commented;
 
 
     public PostModel getPostModel() {
@@ -71,5 +73,21 @@ public class Comment {
 
     public void setCommenterPhoto(String commenterPhoto) {
         this.commenterPhoto = commenterPhoto;
+    }
+
+    public int getCommenterId() {
+        return commenterId;
+    }
+
+    public void setCommenterId(int commenterId) {
+        this.commenterId = commenterId;
+    }
+
+    public String getData_commented() {
+        return data_commented;
+    }
+
+    public void setData_commented(String data_commented) {
+        this.data_commented = data_commented;
     }
 }

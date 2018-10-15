@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Toasty.error(getBaseContext(),"failure to login try again",Toast.LENGTH_SHORT).show();
                 mProgressDialog.dismiss();
-                Log.e(TAG,responseString );
+             //   Log.e(TAG,responseString );
 
             }
 
@@ -192,6 +192,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(login);
             finish();
 
-        };
+        }
     }
 }

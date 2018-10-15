@@ -59,9 +59,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         linearLayoutManager=new LinearLayoutManager(getBaseContext());
-        linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mPostAdapter=new PostAdapter(this, list_of_postModel);
+        //mPostAdapter=new PostAdapter(this, list_of_postModel);
         mRecyclerView.setAdapter(mPostAdapter);
 
         getData();
@@ -146,7 +146,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         JSONObject postername=new JSONObject(object.optString("publisher"));
 
-                        postModel.setUser(postername.optString("display_name"));
+                        postModel.setPublisherName(postername.optString("display_name"));
                         postModel.setPosterImage(postername.optString("dp"));
                         if (object.has("images")){
 
@@ -167,7 +167,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             }
                             else{
-                                postModel.setPostImage("im null right now");
+                                if (!object.isNull("docs")){
+                                    JSONArray Array=new JSONArray(object.optString("docs"));
+                                    if (Array.length()>0) {
+                                        JSONObject doc = Array.getJSONObject(0);
+
+                                        Log.e(TAG,doc.optString("doc"));
+                                    }else{
+                                        postModel.setPostImage("1");
+                                    }
+                                }
                             }
                         }
 
@@ -188,7 +197,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
                         list_of_postModel.add(postModel);
-                        Log.e(TAG, postModel.getPost()+ "" + postModel.getDate()+" "+ postModel.getUser() );
+                        Log.e(TAG, postModel.getPost()+ "" + postModel.getDate()+" "+ postModel.getPublisherName() );
                        //Log.e(TAG,  postModel.getPostImage());
                         mPostAdapter.notifyDataSetChanged();
 
