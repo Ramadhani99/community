@@ -18,9 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -34,7 +36,6 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.madega.ramadhani.njootucode.Activity.PostWithCommentsActivity;
 import com.madega.ramadhani.njootucode.Activity.ViewPhotoLayoutActivity;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
-import com.madega.ramadhani.njootucode.Fragments.HomeFragment;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.Models.User;
 import com.madega.ramadhani.njootucode.R;
@@ -69,11 +70,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
     private List<PostModel> mPostModels =new ArrayList<>();
     private  Context context;
 
-    public PostAdapter(Context context, List<PostModel> postModels,HomeFragment fragment ) {
+    public PostAdapter(Context context, List<PostModel> postModels ) {
 
         this.mPostModels = postModels;
         this.context = context;
-        this.adapterCallback = fragment;
+        adapterCallback = (PostAdapterCallback)context;
 
 
     }
@@ -119,6 +120,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
         private ProgressBar mImageProgressBar;
         private View mCard,mControl,mWrite_post,mPostPublish,mPostLayout;
         private TextView mPdfView;
+        private VideoView mPostVideo;
 
 
 
@@ -128,6 +130,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
 
         public Itemholder(View itemView) {
             super(itemView);
+
             mWrite_post=itemView.findViewById(R.id.write_post);
 
             mTotatlike=itemView.findViewById(R.id.total_like);
@@ -138,6 +141,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
             mPostLayout.setOnClickListener(this);
 
             mPdfView=itemView.findViewById(R.id.pdfView);
+            mPostVideo=itemView.findViewById(R.id.post_video);
 
 
 
@@ -185,12 +189,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
             Log.e(TAG, postModel.getPost());
             Log.e(TAG,""+postModel.ATTACHMENT_TYPE);
 
-            if (postModel.getPostImage().length()<3){
+            if (postModel.getPostAttachment().length()<3){
                 mCard.setVisibility(View.GONE);
                 mControl.setVisibility(View.VISIBLE);
                 mDefaultImage.setVisibility(View.GONE);
 
-                Log.e(TAG,postModel.getPostImage());
+                Log.e(TAG,postModel.getPostAttachment());
 
 
             }
@@ -199,10 +203,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
                     mCard.setVisibility(View.VISIBLE);
                     mControl.setVisibility(View.GONE);
                     mDefaultImage.setVisibility(View.VISIBLE);
-                    Log.e(TAG, postModel.getPostImage());
+                    Log.e(TAG, postModel.getPostAttachment());
 
                     Glide.with(context)
-                            .load(postModel.getPostImage())
+                            .load(postModel.getPostAttachment())
                             .listener(new RequestListener<Drawable>() {
 
                                 @Override
@@ -229,8 +233,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
                     mCard.setVisibility(View.GONE);
                     mDefaultImage.setVisibility(View.GONE);
                     mPdfView.setVisibility(View.VISIBLE);
-                    mPdfView.setText(postModel.getPostImage());
+                    mPdfView.setText(postModel.getPostAttachment());
 
+
+                }
+                else if(postModel.ATTACHMENT_TYPE==3){
+                    mPostVideo.setVisibility(View.VISIBLE);
+                    mPostVideo.setVideoPath(postModel.getPostAttachment());
+                    mPostVideo.setMediaController(new MediaController(context));
+                    mPostVideo.requestFocus();
+                    mPostVideo.start();
 
                 }
             }
@@ -305,8 +317,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Itemholder> {
                     break;
                 case R.id.post_image:
                     Intent showImage=new Intent(context,ViewPhotoLayoutActivity.class);
-                   showImage.putExtra("image",postModel.getPostImage());
-                    Log.e(TAG,"hii hapa"+postModel.getPostImage());
+                   showImage.putExtra("image",postModel.getPostAttachment());
+                    Log.e(TAG,"hii hapa"+postModel.getPostAttachment());
                     context.startActivity(showImage);
                     break;
                 case R.id.posttext:

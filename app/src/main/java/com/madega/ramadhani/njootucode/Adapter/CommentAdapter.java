@@ -1,14 +1,12 @@
 package com.madega.ramadhani.njootucode.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,14 +17,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
-import com.madega.ramadhani.njootucode.Activity.ViewPhotoLayoutActivity;
+import com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity;
+import com.madega.ramadhani.njootucode.Activity.PostWithCommentsActivity;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Models.Comment;
 import com.madega.ramadhani.njootucode.Models.PostModel;
@@ -49,11 +44,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
     private List<Comment> comments=new ArrayList<>();
     private PostModel post;
     private Context context;
+    private CommentAdapterCallBack commentAdapterCallBack;
 
-    public CommentAdapter(Context context,List<Comment> comments) {
+    public CommentAdapter(Context context, List<Comment> comments) {
         this.comments = comments;
         this.context = context;
-        this.post=post;
+        commentAdapterCallBack=  (CommentAdapterCallBack) context;
+
+
     }
 
     @NonNull
@@ -80,9 +78,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
         private Comment comment;
         private  int current_position;
 
-       private TextView mOpenPost,mCommentView,mAuthorName,mLikes,mTotalCommments,mCommentedTime;
+        private View mCommentViewLayout;
 
-       private ImageView mOpenPostImage,mBtnmore,mDefaulImage,mAuthorImage;
+       private TextView mOpenPost,mCommentView,mAuthorName, mTotal_like,mCommentedTime;
+
+       private ImageView mOpenPostImage,mBtnmore,mDefaulImage,mAuthorImage,mLikes;
 
         public Itemholder(View itemView) {
 
@@ -94,11 +94,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
 
 
             mAuthorName=itemView.findViewById(R.id.comenter);
+            mCommentViewLayout=itemView.findViewById(R.id.comment_layout);
 
             mAuthorImage=itemView.findViewById(R.id.my_image);
-            mLikes=itemView.findViewById(R.id.count_like);
+            mTotal_like =itemView.findViewById(R.id.count_like);
+            mLikes=itemView.findViewById(R.id.likebtn);
+            mLikes.setOnClickListener(this);
 
            // mCommentLayout=itemView.findViewById(R.id.comment_layout);
+
+
 
 
 
@@ -116,37 +121,23 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
         public void SaveData(Comment comment,int position){
             current_position=position;
 
-//            if (position<1){
-//                post=comment.getPostModel();
-//                mPostcard.setVisibility(View.VISIBLE);
-//
-//
-//                //mDefaulImage.setVisibility(View.VISIBLE);
-//
-//               // mAllComment.setVisibility(View.VISIBLE);
-//
-//
-//
-//
-//
-//            }
-//            else {
-//                mPostcard.setVisibility(View.GONE);
-//                mAllComment.setVisibility(View.GONE);
-//            }
+
             if (comment.isHasComment()){
 
+                mCommentViewLayout.setVisibility(View.VISIBLE);
 
                 Log.e(TAG,comment.getBody());
                 mCommentView.setText(comment.getBody());
                 mAuthorName.setText(comment.getCommenter());
                 Glide.with(context).load(comment.getCommenterPhoto()).into(mAuthorImage);
-                mLikes.setText(""+comment.getLikes());
+                mTotal_like.setText(""+comment.getLikes());
 
                 mCommentedTime.setText(comment.getData_commented());
+                LikePost(comment.isLiked());
 
             }
             else {
+                mCommentViewLayout.setVisibility(View.GONE);
 
                 //mTotalCommments.setText("No Comments");
                // mCommentLayout.setVisibility(View.GONE);
@@ -201,20 +192,60 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                 case R.id.open_post_image:
 
                         break;
+                case R.id.likebtn:
+                    commentAdapterCallBack.Like_Unlike_Comment(comment);
+                    if (comment.isLiked()){
+                       comment.setLikes(comment.getLikes()-1);
+                    }else{
+                        comment.setLikes(comment.getLikes()+1);
+                    }
+                    comment.setLiked(!comment.isLiked());
+
+                    LikePost(comment.isLiked());
+
+                    break;
             }
+        }
+        private void LikePost(Boolean test){
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (test) {
+                    mLikes.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_favorite_black_24dp, context.getTheme()));
+
+                } else {
+                    mLikes.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_favorite_border_black_24dp, context.getTheme()));
+
+                }
+            }
+            else{
+
+                if (test){
+                    mLikes.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_favorite_black_24dp));
+
+
+                }
+                else {
+                   mLikes.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_favorite_border_black_24dp));
+
+                }
+
+            }
+
         }
         private void DeleteComment(){
 
-            AsyncHttpClient deletepost=new AsyncHttpClient();
+
+            AsyncHttpClient deletePostRequest=new AsyncHttpClient();
             RequestParams params=new RequestParams();
             params.put("token",LOGINUSER.getToken());
             params.put("comment_id",comment.getId());
-            deletepost.get(StaticInformation.DELETE_COMMENT,params, new TextHttpResponseHandler() {
+            deletePostRequest.get(StaticInformation.DELETE_COMMENT,params, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Toasty.error(context,responseString, Toast.LENGTH_SHORT).show();
-
+                    Toasty.error(context, responseString, Toast.LENGTH_SHORT).show();
                 }
+
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseString) {
@@ -224,12 +255,28 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Itemhold
                     notifyItemRemoved(current_position);
                     notifyItemRangeRemoved(current_position,getItemCount());
                     notifyDataSetChanged();
+
                 }
             });
 
 
         }
+
     }
+
+    public interface CommentAdapterCallBack{
+        void Like_Unlike_Comment(Comment comment);
+
+    }
+    public void addComment(Comment comment){
+        Toasty.info(context.getApplicationContext(),"Inafika",Toast.LENGTH_SHORT).show();
+        comments.add(getItemCount(),comment);
+        notifyItemInserted(getItemCount());
+
+
+    }
+
+
 
 
 }

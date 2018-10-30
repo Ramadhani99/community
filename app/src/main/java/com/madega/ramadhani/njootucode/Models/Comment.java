@@ -15,6 +15,8 @@ public class Comment {
     private int commenterId;
     private String commenterPhoto;
     private String data_commented;
+    private boolean liked;
+
 
 
     public PostModel getPostModel() {
@@ -89,5 +91,13 @@ public class Comment {
 
     public void setData_commented(String data_commented) {
         this.data_commented = data_commented;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 }

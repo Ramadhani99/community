@@ -64,7 +64,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         //mPostAdapter=new PostAdapter(this, list_of_postModel);
         mRecyclerView.setAdapter(mPostAdapter);
 
-        getData();
+        ReloadData();
 
         mTryagain=findViewById(R.id.tryagain);
         mTryagain.setOnClickListener(this);
@@ -115,7 +115,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void getData(){
+    private void ReloadData(){
         AsyncHttpClient client=new AsyncHttpClient();
         Intent myintent=getIntent();
         logiuser= SharedPreferenceHelper.getUSer(getBaseContext());
@@ -154,9 +154,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 JSONArray Array=new JSONArray(object.optString("images"));
                                if (Array.length()>0) {
                                    JSONObject image = Array.getJSONObject(0);
-                                   postModel.setPostImage(image.optString("photo"));
+                                   postModel.setPostAttachment(image.optString("photo"));
                                }else{
-                                   postModel.setPostImage("1");
+                                   postModel.setPostAttachment("1");
                                }
 
 
@@ -174,7 +174,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                                         Log.e(TAG,doc.optString("doc"));
                                     }else{
-                                        postModel.setPostImage("1");
+                                        postModel.setPostAttachment("1");
                                     }
                                 }
                             }
@@ -185,7 +185,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                        for(int j=0;i<arrayImages.length();i++){
 //                            JSONObject image=arrayImages.getJSONObject(i);
 
-//                            Log.e(TAG,postModel.getPostImage());
+//                            Log.e(TAG,postModel.getPostAttachment());
 //                        }
 
 
@@ -198,7 +198,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         list_of_postModel.add(postModel);
                         Log.e(TAG, postModel.getPost()+ "" + postModel.getDate()+" "+ postModel.getPublisherName() );
-                       //Log.e(TAG,  postModel.getPostImage());
+                       //Log.e(TAG,  postModel.getPostAttachment());
                         mPostAdapter.notifyDataSetChanged();
 
                     }
@@ -240,7 +240,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
           case R.id.tryagain:
                // mProgressBar.setVisibility(View.VISIBLE);
                 list_of_postModel.clear();
-                getData();
+                ReloadData();
                 break;
                 default:
                     break;

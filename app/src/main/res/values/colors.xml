@@ -20,4 +20,5 @@
     <color name="till">#00796B</color>
     <color name="blackBackground">#f2000000</color>
     <color name="blacklight">#6c000000</color>
+    <color name="separetor">#f5f5f5</color>
 </resources>

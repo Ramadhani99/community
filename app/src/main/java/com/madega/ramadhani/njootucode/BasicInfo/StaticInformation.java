@@ -23,5 +23,11 @@ public class StaticInformation {
     public static final String DELETE_COMMENT =MAIN_URL+"community/delete_comment/" ;
     public static final String LIKE_POST =MAIN_URL+"community/like_post/" ;
     public static final String UNLIKE_POST =MAIN_URL+"community/unlike_post/" ;
+    public static final String USER_PROFILE =MAIN_URL+"community/profile/" ;
+    public static final String LIKE_COMMENT =MAIN_URL+"community/like_comment/" ;
+    public static final String UNLIKE_COMMENT =MAIN_URL+"community/unlike_comment/" ;
+
+
+    public static final String USER_WALL =MAIN_URL+"community/user_wall/" ;
 
 }

@@ -1,6 +1,5 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,13 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity;
 import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
+import com.madega.ramadhani.njootucode.Helper.ConnectionAvailable;
 import com.madega.ramadhani.njootucode.Helper.EndlessRecyclerViewScrollListener;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.Models.PostPublishModel;
@@ -31,23 +30,21 @@ import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 import com.madega.ramadhani.njootucode.Storage.SharedPreferenceHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import es.dmoral.toasty.Toasty;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 /**
  * Created by root on 9/22/18.
  */
 
-public class HomeFragment extends Fragment implements View.OnClickListener,PostAdapter.PostAdapterCallback {
+public class HomeFragment extends Fragment implements View.OnClickListener{
 
 
     private static String TAG = "HomeFragment";
@@ -80,6 +77,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
 
     @Override
     public void onStart() {
+
         Db = ApplicationDatabase.getApplicationDatabase(getContext());
         super.onStart();
         new AsyncTask<Void, Void, Void>() {
@@ -106,6 +104,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
             }
         }.execute(null, null);
 
+    if (!ConnectionAvailable.hasConnection(getContext())){
+        Toasty.info(getContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+
+    }
+    else {
+        ReloadData(0);
+
+    }
+
+
 
 
 
@@ -115,6 +123,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+
 
         View v = inflater.inflate(R.layout.home_fragment, container, false);
         mRecyclerView = v.findViewById(R.id.recyclerview);
@@ -127,18 +137,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
 
         linearLayoutManager = new LinearLayoutManager(getContext());
 
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mPostAdapter = new PostAdapter(getContext(), list_of_postModel,HomeFragment.this);
-        mRecyclerView.setAdapter(mPostAdapter);
 
-        getData(0);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mPostAdapter = new PostAdapter(getContext(), list_of_postModel);
+        mRecyclerView.setAdapter(mPostAdapter);
+        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
+
+
+
 
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 
-                getData(page+1);
+                ReloadData(page+1);
 
 
 
@@ -146,7 +161,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
             }
         };
        mRefresher= v.findViewById(R.id.swiperefresh);
-       mRefresher.setOnRefreshListener(() -> getData(1));
+       mRefresher.setOnRefreshListener(() -> ReloadData(1));
 
 
 
@@ -165,7 +180,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
 
 
 
-    private void getData(int page) {
+    private void ReloadData(int page) {
 
        // Toasty.info(getContext(),"current page "+page, Toast.LENGTH_SHORT).show();
 
@@ -182,6 +197,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                 mSmoothProgressBar.setVisibility(View.GONE);
+                mPublishPostProgress.setVisibility(View.GONE);
                 mRefresher.setRefreshing(false);
 
                 if (page==0||page==1){
@@ -224,29 +240,40 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
                                 if (Array.length() > 0) {
                                     postModel.ATTACHMENT_TYPE=1;
                                     JSONObject image = Array.getJSONObject(0);
-                                    postModel.setPostImage(image.optString("photo"));
+                                    postModel.setPostAttachment(image.optString("photo"));
                                 } else {
                                     if (!object.isNull("docs")){
                                         JSONArray Array2=new JSONArray(object.optString("docs"));
                                         if (Array2.length()>0) {
                                             postModel.ATTACHMENT_TYPE=2;
                                             JSONObject doc = Array2.getJSONObject(0);
-                                            postModel.setPostImage(doc.optString("doc"));
+                                            postModel.setPostAttachment(doc.optString("doc"));
                                             Log.e(TAG,doc.optString("doc"));
                                         }else{
-                                            postModel.setPostImage("1");
+                                            postModel.setPostAttachment("1");
                                         }
+                                    }else if(!object.isNull("videos")) {
+
+                                      JSONArray listOfVideo=new JSONArray(object.optString("video"));
+                                      if (listOfVideo.length()>0){
+                                          postModel.ATTACHMENT_TYPE=3;
+                                          JSONObject mVideo=listOfVideo.getJSONObject(0);
+                                          postModel.setPostAttachment(mVideo.optString("video"));
+
+                                      }
+
+
                                     }
 
                                 }
 
 
                             } else {
-                                postModel.setPostImage("2");
+                                postModel.setPostAttachment("2");
                             }
                         }
                         else {
-                            postModel.setPostImage("2");
+                            postModel.setPostAttachment("2");
                         }
 
 
@@ -288,6 +315,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable error) {
+                mPublishPostProgress.setVisibility(View.GONE);
 
                 mSmoothProgressBar.setVisibility(View.GONE);
                 Log.e(TAG,"Failure "+responseBody+statusCode);
@@ -314,8 +342,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
         switch (v.getId()) {
             case R.id.create_postbtn:
                 Intent myintent=new Intent(getActivity(), PostPublishLayoutActivity.class);
-              // mlistState= linearLayoutManager.onSaveInstanceState();
-
                 getActivity(). startActivityForResult(myintent,1);
 
                 break;
@@ -328,64 +354,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
     }
 
 
-    @Override
-    public void sendObject(PostModel postModel) {
-        //Toasty.success(getContext(),postModel.getPost(),Toast.LENGTH_SHORT).show();
-
-
-
-
-
-        String url_api;
-        Log.e(TAG,postModel.isLike()+"");
-
-        AsyncHttpClient likepost=new AsyncHttpClient();
-        RequestParams params=new RequestParams();
-        params.put("token",logiuser.getToken());
-        params.put("post_id",postModel.getId());
-        if (postModel.isLike()){
-            url_api=StaticInformation.UNLIKE_POST;
-        }
-        else {
-            url_api=StaticInformation.LIKE_POST;
-        }
-        likepost.get(url_api,params, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                //Toasty.error(getContext(),responseString,Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                try {
-                    JSONArray responze  = new JSONArray(responseString);
-
-                    JSONObject object = responze.getJSONObject(0);
-                    if (object.getBoolean("status") ){
-
-
-
-                    }
-                    else if (object.getBoolean("status") ){
-
-                    }
-                    else {
-                       // Toasty.error(getContext(),responseString,Toast.LENGTH_SHORT).show();
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-
-            }
-        });
-
-
-
-    }
 
 
 
@@ -401,70 +369,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener,PostA
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Toasty.success(getContext(),"inafika hapa",Toast.LENGTH_SHORT).show();
-        getActivity();
-
-        if (requestCode == 1) {
-            String result=data.getStringExtra("result");
-            mPostPublishModel=new Gson().fromJson(result,PostPublishModel.class);
-            if(resultCode == Activity.RESULT_OK){
-                createPost();
-
-                Toasty.success(getContext(),"Fragment"+mPostPublishModel.getUser_token(), Toast.LENGTH_SHORT).show();
-
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-
-            }
-        }
-        else {
-            Toasty.error(getContext(),"hiooo"+mPostPublishModel.getUser_token(), Toast.LENGTH_SHORT).show();
-        }
-    }
-    private void createPost(){
-
-        AsyncHttpClient createpost=new AsyncHttpClient();
-        RequestParams params=new RequestParams();
-        params.put("token",mPostPublishModel.getUser_token());
-        params.put("content",mPostPublishModel.getTextPost());
-
-            //Log.e(TAG,ImgUrl);
-            try {
-
-                if(mPostPublishModel.getImgPost() != null){
-                    params.put("photo",new File(mPostPublishModel.getImgPost()));
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Log.e(TAG,"ERROR upload file "+ e.getMessage());
-
-            }
-
-        createpost.post(StaticInformation.PUBLISH_POST, params, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG,""+statusCode+""+responseString);
-                Toasty.error(getContext(),""+statusCode+""+responseString, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Toasty.success(getContext(),responseString, Toast.LENGTH_SHORT).show();
-
-
-            }
-
-            @Override
-            public void onStart() {
-                super.onStart();
-                mPublishPostProgress.setVisibility(View.VISIBLE);
-
-            }
-        });
-    }
 
 
 }

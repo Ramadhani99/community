@@ -1,11 +1,8 @@
 package com.madega.ramadhani.njootucode.Fragments;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +11,6 @@ import android.view.ViewGroup;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
-import com.madega.ramadhani.njootucode.Activity.PostPublishLayoutActivity;
-import com.madega.ramadhani.njootucode.Adapter.PostAdapter;
 import com.madega.ramadhani.njootucode.BasicInfo.StaticInformation;
 import com.madega.ramadhani.njootucode.Models.PostModel;
 import com.madega.ramadhani.njootucode.R;
@@ -23,9 +18,6 @@ import com.madega.ramadhani.njootucode.Storage.ApplicationDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -106,14 +98,14 @@ public class CommunityFragment extends Fragment implements View.OnClickListener 
                                 JSONArray Array = new JSONArray(object.optString("images"));
                                 if (Array.length() > 0) {
                                     JSONObject image = Array.getJSONObject(0);
-                                    postModel.setPostImage(image.optString("photo"));
+                                    postModel.setPostAttachment(image.optString("photo"));
                                 } else {
-                                    postModel.setPostImage("1");
+                                    postModel.setPostAttachment("1");
                                 }
 
 
                             } else {
-                                postModel.setPostImage("im null right now");
+                                postModel.setPostAttachment("im null right now");
                             }
                         }
 
@@ -121,7 +113,7 @@ public class CommunityFragment extends Fragment implements View.OnClickListener 
 
 
                         Log.e(TAG, postModel.getPost() + "" + postModel.getDate() + " " + postModel.getPublisherName());
-                        //Log.e(TAG,  postModel.getPostImage());
+                        //Log.e(TAG,  postModel.getPostAttachment());
 
 
                     }

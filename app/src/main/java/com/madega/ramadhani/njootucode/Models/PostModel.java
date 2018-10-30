@@ -19,16 +19,15 @@ public class PostModel {
     @PrimaryKey(autoGenerate = false)
     private int id;
 
-
     private boolean isLike;
 
     private String Share,Postname,Date,post;
 
     private int Likes,Comments;
 
-    private String PosterImage;
+    private String posterImage,postedVideo;
 
-    private String PostImage;
+    private String postAttachment;
     private String publisherName;
     private int publisherId;
 
@@ -100,19 +99,19 @@ public class PostModel {
     }
 
     public String getPosterImage() {
-        return PosterImage;
+        return posterImage;
     }
 
     public void setPosterImage(String posterImage) {
-        PosterImage = posterImage;
+        this.posterImage = posterImage;
     }
 
-    public String getPostImage() {
-        return PostImage;
+    public String getPostAttachment() {
+        return postAttachment;
     }
 
-    public void setPostImage(String postImage) {
-        PostImage = postImage;
+    public void setPostAttachment(String postAttachment) {
+        this.postAttachment = postAttachment;
     }
 
     public int getPublisherId() {
@@ -129,5 +128,13 @@ public class PostModel {
 
     public void setLike(boolean like) {
         isLike = like;
+    }
+
+    public String getPostedVideo() {
+        return postedVideo;
+    }
+
+    public void setPostedVideo(String postedVideo) {
+        this.postedVideo = postedVideo;
     }
 }
